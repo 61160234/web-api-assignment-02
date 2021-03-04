@@ -1,8 +1,20 @@
 const express = require('express')
+const MongoClient = require('mongodb').MongoClient
+const ObjectID = require('mongodb').ObjectId
 const app = express()
 
 app.use(express.json())
-let Books = []
+
+const url = 'mongodb+srv://superadmin:B@oat7642@cluster0.vufob.mongodb.net/sample_book?retryWrites=true&w=majority'
+const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true })
+let db, BooksCollection
+
+async function connect() {
+    await client.connect()
+    db = client.db('sample_book')
+    booksCollection = db.collection('Books')
+}
+connect()
 
 // POST /books
 app.post('/Books', (req, res) => {
@@ -25,7 +37,8 @@ app.post('/Books', (req, res) => {
     let BookID = 0
 
     //process
-    Books.push(newBook)
+    const result = await BooksCollection.insertOne(newBook)
+    bookID = result.insertedId
 
     //n-1
     BookID = books.length - 1
@@ -34,18 +47,5 @@ app.post('/Books', (req, res) => {
 
     res.status(201).json(BookID)
 })
-    app.get('/Books/:id', (req, res) => {
-    //input
-    let id = req.params.id
-
-    let Book = {}
-
-    //process
-    Book = Books[id]
-
-    //output
-    res.status(200).json(Book)
-})
-
 const port = 3000
 app.listen(3000, () => console.log("Server started at ${port}"))
