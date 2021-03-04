@@ -47,5 +47,15 @@ app.post('/Books', (req, res) => {
 
     res.status(201).json(BookID)
 })
+    app.get('/Books/:id', async (req, res) => {
+    //input
+    let id = req.params.id
+
+    //process
+    const Book = await BooksCollection.findOne({ _id: ObjectID(id) })
+
+    //output
+    res.status(200).json(Book)
+})
 const port = 3000
 app.listen(3000, () => console.log("Server started at ${port}"))
